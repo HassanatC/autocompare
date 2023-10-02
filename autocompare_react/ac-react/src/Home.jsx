@@ -44,8 +44,9 @@ function Home() {
       {data && (
               <div>
                 <h2>Data:</h2>
-                <p>Car Price: {data.price}</p>
+                <p>Car Price: £{data.price}</p>
                 <p>Car Brand: {data.brand}</p>
+                <p>Car Mileage: {data.mileage} </p>
               </div>
             )}
 
@@ -54,8 +55,9 @@ function Home() {
                 <h2>Motors Data:</h2>
                 {motorsData.map((item, index) => (
                   <div key={index}>
-                    <p>Other car Price: {item.price}</p>
-                    <p>Other car Mileage: {item.mileage}</p>
+                    <p>Price: £{item.price}</p>
+                    <p>Mileage: {item.mileage} miles</p>
+                    <p>Deal: <a href={item.link} target="_blank" rel="noopener noreferrer">{item.link}</a></p>
                   </div>
                 ))}
               </div>

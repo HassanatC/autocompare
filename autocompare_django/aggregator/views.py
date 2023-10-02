@@ -18,7 +18,6 @@ def scrape_car_data(request):
     data = {}
     motors_data = {}
     form = CarURLForm()
-    links = []
 
     if request.method == 'POST':
         form = CarURLForm(request.data)
