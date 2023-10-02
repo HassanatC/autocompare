@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from selenium import webdriver
 from selenium.webdriver import Chrome
+import re
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
@@ -35,6 +36,11 @@ def scrape_car_data(request):
                 data["price"] = f"Error: {e}"
 
             try:
+                image_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'img')))
+                data["image_url"] = image_element.get_attribute('src')
+            except Exception as e:
+                data["image_url"] = f"Error: {e}"
+            try:
                 brand_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'p[data-testid="advert-title"]')))
                 data["brand"] = brand_element.text
             except Exception as e:
@@ -51,6 +57,18 @@ def scrape_car_data(request):
                 data["registration"] = registration_element.text
             except Exception as e:
                 data["registration"] = f"Error: {e}"
+
+            try:
+                previous_owners_element = wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(text(), 'Previous')]/following-sibling::p")))
+                full_text = previous_owners_element.text
+                owner_count_match = re.search(r'\d+', full_text)
+                if owner_count_match:
+                    owner_count = owner_count_match.group() 
+                    data["previous_owners"] = owner_count
+                else:
+                    data["previous_owners"] = "Could not determine"
+            except Exception as e:
+                data["previous_owners"] = f"Not Available"
 
             driver.quit()
 
@@ -119,10 +137,15 @@ def search_motors_similar(data):
                 mileage = mileage_element.text
                 print(f"Mileage element found. Text: {mileage}")
 
+                image_element = parent_element.find_element(By.CSS_SELECTOR, ".result-card__image-container .lazy img")
+                thumbnail_image = image_element.get_attribute('src')
+
+
                 scraped_data = {
                 'price': price,
                 'link': link,
-                'mileage': mileage
+                'mileage': mileage,
+                'thumbnail_image': thumbnail_image
                 }
                 scraped_data_list.append(scraped_data)
 
