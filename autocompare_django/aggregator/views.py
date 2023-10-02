@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect
 from .forms import CarURLForm
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from selenium import webdriver
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
@@ -9,7 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 # Create your views here.
 
-
+@api_view(['POST'])
 def scrape_car_data(request):
 
     data = {}
@@ -18,13 +21,12 @@ def scrape_car_data(request):
     links = []
 
     if request.method == 'POST':
-        form = CarURLForm(request.POST)
+        form = CarURLForm(request.data)
         if form.is_valid():
             url = form.cleaned_data['url']
 
             driver = Chrome()
             driver.get(url)
-
             wait = WebDriverWait(driver, 1)
 
             try:
@@ -55,15 +57,16 @@ def scrape_car_data(request):
 
             motors_data = search_motors_similar(data)
 
+            response_data = {
+                'data': data,
+                'motors_data': motors_data,
+            }
+            return Response(response_data, status=200)
+        else:
+            return Response({"error": "Invalid form"}, status=400)
+        
+    return Response({"error": "Method not allowed"}, status=405)
 
-    context = {
-        'form': form,
-        'data': data,
-        'motors_data': motors_data,
-        'links': links
-    }
-
-    return render(request, 'scrape_car.html', context)
 
 def search_motors_similar(data):
     trusted_domain = "motors.co.uk"
