@@ -46,6 +46,13 @@ p {
   background-color: #0056b3;
 }
 
+.url-form button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+
+
 .data-section {
   background-color: #faf9f9;
   padding: 10px;

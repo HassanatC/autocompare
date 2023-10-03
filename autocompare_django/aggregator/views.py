@@ -1,11 +1,14 @@
 from django.shortcuts import render, redirect
 from .forms import CarURLForm
+from django.core.cache import cache
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from selenium import webdriver
 from selenium.webdriver import Chrome
 import re
+import time
 import logging
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -15,94 +18,79 @@ from selenium.webdriver.support import expected_conditions as EC
 
 # Create your views here.
 
-logging.basicConfig(level=logging.INFO)
+
 
 @api_view(['POST'])
-def scrape_car_data(request):
-
-    data = {}
-    motors_data = {}
-    form = CarURLForm()
+def main_view(request):
 
     if request.method == 'POST':
         form = CarURLForm(request.data)
         if form.is_valid():
             url = form.cleaned_data['url']
-
             driver = Chrome()
-            driver.get(url)
-            wait = WebDriverWait(driver, 1)
-
-            try:
-                price_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'h2[data-testid="advert-price"]')))
-                data["price"] = price_element.text
-            except Exception as e:
-                data["price"] = f"Error: {e}"
-
-            try:
-                image_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'img')))
-                data["image_url"] = image_element.get_attribute('src')
-            except Exception as e:
-                data["image_url"] = f"Error: {e}"
-            try:
-                brand_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'p[data-testid="advert-title"]')))
-                data["brand"] = brand_element.text
-            except Exception as e:
-                data["brand"] = f"Error: {e}"
-
-            try:
-                mileage_element = wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(text(), 'Mileage')]/following-sibling::p")))
-                data["mileage"] = mileage_element.text
-            except Exception as e:
-                data["mileage"] = f"Error: {e}"
-
-            try:
-                registration_element = wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(text(), 'Registration')]/following-sibling::p")))
-                data["registration"] = registration_element.text
-            except Exception as e:
-                data["registration"] = f"Error: {e}"
-
-            try:
-                previous_owners_element = wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(text(), 'Previous')]/following-sibling::p")))
-                full_text = previous_owners_element.text
-                owner_count_match = re.search(r'\d+', full_text)
-                if owner_count_match:
-                    owner_count = owner_count_match.group() 
-                    data["previous_owners"] = owner_count
-                else:
-                    data["previous_owners"] = "Could not determine"
-            except Exception as e:
-                data["previous_owners"] = f"Not Available"
-
-
+            data = scrape_car_data(url, driver)
             motors_data = search_motors_similar(data, driver)
+            search_fb(data, driver)
 
-            response_data = {
-                'data': data,
-                'motors_data': motors_data,
-            }
-            return Response(response_data, status=200)
+            driver.quit()
+            return Response({"data": data, "motors_data": motors_data}, status=200)
         else:
             return Response({"error": "Invalid form"}, status=400)
-        
-    return Response({"error": "Method not allowed"}, status=405)
+    else:
+        return Response({"error": "Method not allowed"}, status=405)
 
+def scrape_car_data(url, driver):
+    data = {}
+    driver.get(url)
+    wait = WebDriverWait(driver, 1)
 
-def main(data):
     try:
-        driver = Chrome()
-        motors_data = search_motors_similar(data, driver)
+        price_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'h2[data-testid="advert-price"]')))
+        data["price"] = price_element.text
     except Exception as e:
-        print(f"An error occurred: {e}")
-    finally:
-        driver.quit()
+        data["price"] = f"Error: {e}"
 
-    return motors_data
+    try:
+        image_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'img')))
+        data["image_url"] = image_element.get_attribute('src')
+    except Exception as e:
+        data["image_url"] = f"Error: {e}"
+
+    try:
+        brand_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'p[data-testid="advert-title"]')))
+        data["brand"] = brand_element.text
+    except Exception as e:
+        data["brand"] = f"Error: {e}"
+
+    try:
+        mileage_element = wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(text(), 'Mileage')]/following-sibling::p")))
+        data["mileage"] = mileage_element.text
+    except Exception as e:
+        data["mileage"] = f"Error: {e}"
+
+    try:
+        registration_element = wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(text(), 'Registration')]/following-sibling::p")))
+        data["registration"] = registration_element.text
+    except Exception as e:
+        data["registration"] = f"Error: {e}"
+
+    try:
+        previous_owners_element = wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(text(), 'Previous')]/following-sibling::p")))
+        full_text = previous_owners_element.text
+        owner_count_match = re.search(r'\d+', full_text)
+        if owner_count_match:
+            owner_count = owner_count_match.group() 
+            data["previous_owners"] = owner_count
+        else:
+            data["previous_owners"] = "Could not determine"
+    except Exception as e:
+        data["previous_owners"] = f"Not Available"
+
+    return data
 
 def search_motors_similar(data, driver):
     trusted_domain = "motors.co.uk"
     query = f"{data['brand']} {data['registration']} with {data['mileage']} for sale Motors UK"
-
     driver.get("https://www.google.com")
 
     handle_cookie_popup(driver)
@@ -111,7 +99,7 @@ def search_motors_similar(data, driver):
     search_box.send_keys(query)
     search_box.submit()
 
-    wait = WebDriverWait(driver, 1)
+    wait = WebDriverWait(driver, 5)
     wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "h3")))
     
     #finds the relevant motors link
@@ -124,17 +112,20 @@ def search_motors_similar(data, driver):
     #if motors link is found, proceed to scrap the price. rudimentary currently
     
     if motors_links:
+        scraped_data_list = []
         motors_link_to_click = motors_links[0]
         link_element = driver.find_element(By.XPATH, f"//a[@href='{motors_link_to_click}']")
         wait.until(EC.element_to_be_clickable((By.XPATH, f"//a[@href='{motors_link_to_click}']")))
         link_element.click()
+
+        print("Pausing for 60 seconds for inspection")
+        time.sleep(5)
     
         try:
             wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".title-3")))
       
             print("Trying to find price elements...")
             price_elements = driver.find_elements(By.CSS_SELECTOR, ".title-3")
-            scraped_data_list = []
 
             # loops through the price elements in motors. finds them and scrapes
             for price_element in price_elements:
@@ -174,6 +165,42 @@ def search_motors_similar(data, driver):
     scraped_data_list = sort_scraped_data_by_price(scraped_data_list)
     return scraped_data_list
 
+def search_fb(data, driver):
+    trusted_domain = "facebook.com/marketplace"
+    query = f"{data['brand']} {data['registration']} {data['mileage']}facebook marketplace"
+
+    driver.get("https://www.google.com")
+
+    search_box = driver.find_element(By.NAME, "q")
+    search_box.send_keys(query)
+    search_box.submit()
+
+    wait = WebDriverWait(driver, 5)
+    wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "h3")))
+
+    search_results = driver.find_elements(By.XPATH, "//h3/ancestor::a")
+    all_links = [link.get_attribute("href") for link in search_results if link.get_attribute("href")]
+
+    fb_links = [link for link in all_links if link and trusted_domain in link]
+
+    if fb_links:
+        fb_link_to_click = fb_links[0]
+        link_element = driver.find_element(By.XPATH, f"//a[@href='{fb_link_to_click}']")
+        wait.until(EC.element_to_be_clickable((By.XPATH, f"//a[@href='{fb_link_to_click}']")))
+        link_element.click()
+
+        handle_fb_cookie(driver)
+        time.sleep(2)
+
+def handle_fb_cookie(driver):
+    try:
+        accept_button = WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, "//span[text()='Allow all cookies']"))
+        )
+        accept_button.click()
+    except Exception as e:
+        print(f"Error handling cookie popup: {e}")
+
 def sort_scraped_data_by_price(scraped_data_list):
     #method to sort the returned data by cheapest first. currently the standard
     scraped_data_list = [
@@ -196,34 +223,6 @@ def handle_cookie_popup(driver):
 
 
 # will work on soon
-"""
-def search_facebook(data, driver):
-
-    trusted_domain = "facebook.com/marketplace"
-    query = f"{data['brand']} {data['registration']} {data['mileage']}facebook marketplace"
-
-    driver.get("https://www.google.com")
-    handle_cookie_popup(driver)
-
-    search_box = driver.find_element(By.NAME, "q")
-    search_box.send_keys(query)
-    search_box.submit()
-
-    wait = WebDriverWait(driver, 5)
-    wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "h3")))
-
-    search_results = driver.find_elements(By.XPATH, "//h3/ancestor::a")
-    all_links = [link.get_attribute("href") for link in search_results if link.get_attribute("href")]
-
-    fb_links = [link for link in all_links if link and trusted_domain in link]
-    scraped_data_list = []
-
-    if fb_links:
-        fb_link_to_click = fb_links[0]
-        link_element = driver.find_element(By.XPATH, f"//a[@href='{fb_link_to_click}']")
-        wait.until(EC.element_to_be_clickable((By.XPATH, f"//a[@href='{fb_link_to_click}']")))
-        link_element.click()
-"""
 
 """
 def login_facebook(driver):

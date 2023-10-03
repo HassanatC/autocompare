@@ -19,7 +19,7 @@ from django.urls import path
 from aggregator import views
 
 urlpatterns = [
-    path('', views.scrape_car_data, name='scrape_car_data'),
+    path('', views.main_view, name='scrape_car_data'),
     path('admin/', admin.site.urls),
-    path('scrape/', views.scrape_car_data, name='scrape_car_data'),
+    path('scrape/', views.main_view, name='scrape_car_data'),
 ]

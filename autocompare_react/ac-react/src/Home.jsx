@@ -55,7 +55,7 @@ function Home() {
 
       {data && (
               <div className="data-section">
-                <h2>Data:</h2>
+                <h2>Your Chosen Car:</h2>
                 <img src={data.image_url} className="scraped-car-img" alt="Car" />
                 <p>Car Price: {data.price}</p>
                 <p>Car Brand: {data.brand}</p>
@@ -68,7 +68,7 @@ function Home() {
           {/*renders the list of suggested motors*/}
             {motorsData && motorsData.length > 0 && (
               <div>
-                <h2>Motors Data:</h2>
+                <h2>Motors Deals:</h2>
                 {motorsData.map((item, index) => (
                   <div className="motors-section" key={index}>
                     <img src={item.thumbnail_image}></img>
