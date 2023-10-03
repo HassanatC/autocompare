@@ -35,7 +35,7 @@ function Home() {
 
   return (
     <div className="form-container">
-    <header className="header">AutoCompare</header>
+      <header className="header">AutoCompare</header>
       <form className="url-form" onSubmit={handleSubmit}>
         <input
           type="text"
@@ -54,33 +54,38 @@ function Home() {
       )}
 
       {data && (
-              <div className="data-section">
-                <h2>Your Chosen Car:</h2>
-                <img src={data.image_url} className="scraped-car-img" alt="Car" />
-                <p>Car Price: {data.price}</p>
-                <p>Car Brand: {data.brand}</p>
-                <p>Car Registration: {data.registration}</p>
-                <p>Car Mileage: {data.mileage} </p>
-                <p>Previous Owners: {data.previous_owners}</p>
-              </div>
-            )}
+        <div className="data-section">
+          <h2>Your Chosen Car:</h2>
+          <img src={data.image_url} className="scraped-car-img" alt="Car" />
+          <p>Car Price: {data.price}</p>
+          <p>Car Brand: {data.brand}</p>
+          <p>Car Registration: {data.registration}</p>
+          <p>Car Mileage: {data.mileage} </p>
+          <p>Previous Owners: {data.previous_owners}</p>
+        </div>
+      )}
 
-          {/*renders the list of suggested motors*/}
-            {motorsData && motorsData.length > 0 && (
-              <div>
-                <h2>Motors Deals:</h2>
-                {motorsData.map((item, index) => (
-                  <div className="motors-section" key={index}>
-                    <img src={item.thumbnail_image}></img>
-                    <p>Price: £{item.price}</p>
-                    <p>Mileage: {item.mileage} miles</p>
-                    <p>Deal: <a href={item.link} target="_blank" rel="noopener noreferrer">{item.link}</a></p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      }
+      {/*renders the list of suggested motors*/}
+      {motorsData && motorsData.length > 0 && (
+        <div>
+          <h2>Motors Deals:</h2>
+          {motorsData.map((item, index) => (
+            <div className="motors-section" key={index}>
+              
+              {/* Wrapped the image with an anchor tag */}
+              <a href={item.link} target="_blank" rel="noopener noreferrer">
+                <img src={item.thumbnail_image} alt={`Motor deal ${index + 1}`} />
+              </a>
+              
+              <p>Price: £{item.price}</p>
+              <p>Mileage: {item.mileage} miles</p>
+              <p>Deal: <a href={item.link} target="_blank" rel="noopener noreferrer">{item.link}</a></p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default Home;

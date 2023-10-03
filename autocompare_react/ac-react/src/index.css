@@ -1,76 +1,129 @@
-body {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 16px;
+:root {
+  --primary-color: #0056b3;
+  --hover-color: #003f8a;
+  --neutral-light: #ffffff;
+  --neutral-dark: #f0f0f0;
+  --border-color: #999;
+  --font-family-primary: 'Nunito', sans-serif;
+  --font-family-secondary: 'Roboto', sans-serif;
 }
 
-p {
-  font-size: 20px;
+body {
+  font-family: var(--font-family-primary);
+  font-size: 16px;
+  background-color: #e6e9ed;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+p, h2 {
+  font-family: var(--font-family-secondary);
+  margin-bottom: 16px;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: 600;
 }
 
 .form-container {
-  margin: 20px;
+  margin: 40px auto;
   padding: 20px;
-  border: 2px solid #ccc;
+  border: 2px solid var(--border-color);
+  max-width: 800px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  background-color: var(--neutral-light);
 }
 
 .header {
   font-size: 32px;
   font-weight: bold;
+  text-align: center;
   padding: 1rem;
+  color: var(--primary-color);
 }
 
 .url-form {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .scraped-car-img {
   width: 350px;
+  margin-top: 20px;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.scraped-car-img:hover {
+  transform: scale(1.05);
 }
 
 .url-form input {
-  width: 60%;
-  height: 30px;
-  padding: 10px;
+  width: calc(100% - 30px); /* Adjusted width to account for padding */
+  height: 45px;
+  padding: 0 15px;
   margin: 10px 0;
-  border: 2.5px solid #ccc;
+  border: 2.5px solid var(--border-color);
   border-radius: 4px;
   font-size: 18px;
+  padding-left: 25px; /* New padding */
+  padding-right: 25px; /* New padding */
+  transition: border-color 0.3s ease;
+}
+
+.url-form input:focus {
+  border-color: var(--primary-color);
+  outline: none;
 }
 
 .url-form button {
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px;
+  transition: background-color 0.3s ease;
 }
 
 .url-form button:hover {
-  background-color: #0056b3;
+  background-color: var(--hover-color);
 }
 
 .url-form button:disabled {
-  background-color: #ccc;
+  background-color: var(--border-color);
   cursor: not-allowed;
+}
+
+.data-section, .motors-section {
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .data-section {
   background-color: var(--neutral-light);
-  padding: 20px;
   border: 1px solid var(--border-color); 
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);/
 }
 
 .motors-section {
   background-color: var(--neutral-dark);
-  padding: 20px; 
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: 1px solid var(--border-color);
+}
+
+.motors-section img {
+  max-width: 100%;
+  border-radius: 4px;
+  transition: transform 0.3s ease;
+}
+
+.motors-section img:hover {
+  transform: scale(1.05);
 }
