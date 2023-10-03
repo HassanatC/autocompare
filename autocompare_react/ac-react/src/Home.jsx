@@ -35,6 +35,7 @@ function Home() {
 
   return (
     <div className="form-container">
+    <header className="header">AutoCompare</header>
       <form className="url-form" onSubmit={handleSubmit}>
         <input
           type="text"
@@ -82,4 +83,4 @@ function Home() {
         );
       }
 
-export default Home
+export default Home;

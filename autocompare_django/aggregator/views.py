@@ -137,6 +137,7 @@ def search_motors_similar(data, driver):
                 print(f"Mileage element found. Text: {mileage}")
 
                 image_element = parent_element.find_element(By.CSS_SELECTOR, ".result-card__image-container .lazy img")
+                #grabs first image
                 thumbnail_image = image_element.get_attribute('src')
 
                 scraped_data = {
@@ -177,7 +178,7 @@ def search_fb(data, driver):
     all_links = [link.get_attribute("href") for link in search_results if link.get_attribute("href")]
 
     fb_links = [link for link in all_links if link and trusted_domain in link]
-
+    #access fb link similar to how motors does it
     if fb_links:
         fb_link_to_click = fb_links[0]
         link_element = driver.find_element(By.XPATH, f"//a[@href='{fb_link_to_click}']")
@@ -185,6 +186,7 @@ def search_fb(data, driver):
         link_element.click()
 
         handle_fb_cookie(driver)
+        #sleep engaged for the purpose of inspection
         time.sleep(2)
 
 def handle_fb_cookie(driver):
