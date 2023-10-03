@@ -6,12 +6,16 @@ from rest_framework.response import Response
 from selenium import webdriver
 from selenium.webdriver import Chrome
 import re
+import logging
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 
 # Create your views here.
+
+logging.basicConfig(level=logging.INFO)
 
 @api_view(['POST'])
 def scrape_car_data(request):
@@ -70,9 +74,8 @@ def scrape_car_data(request):
             except Exception as e:
                 data["previous_owners"] = f"Not Available"
 
-            driver.quit()
 
-            motors_data = search_motors_similar(data)
+            motors_data = search_motors_similar(data, driver)
 
             response_data = {
                 'data': data,
@@ -85,11 +88,21 @@ def scrape_car_data(request):
     return Response({"error": "Method not allowed"}, status=405)
 
 
-def search_motors_similar(data):
+def main(data):
+    try:
+        driver = Chrome()
+        motors_data = search_motors_similar(data, driver)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        driver.quit()
+
+    return motors_data
+
+def search_motors_similar(data, driver):
     trusted_domain = "motors.co.uk"
     query = f"{data['brand']} {data['registration']} with {data['mileage']} for sale Motors UK"
 
-    driver = Chrome()
     driver.get("https://www.google.com")
 
     handle_cookie_popup(driver)
@@ -140,7 +153,6 @@ def search_motors_similar(data):
                 image_element = parent_element.find_element(By.CSS_SELECTOR, ".result-card__image-container .lazy img")
                 thumbnail_image = image_element.get_attribute('src')
 
-
                 scraped_data = {
                 'price': price,
                 'link': link,
@@ -155,8 +167,6 @@ def search_motors_similar(data):
                 'price': 'Error',
                 'link': 'Error'
             }
-
-    driver.quit()
 
     print("Motors Link:", motors_links)
     print("Scraped Data:", scraped_data_list)
@@ -183,3 +193,56 @@ def handle_cookie_popup(driver):
         accept_button.click()
     except Exception as e:
         print(f"Error handling cookie popup: {e}")
+
+
+# will work on soon
+"""
+def search_facebook(data, driver):
+
+    trusted_domain = "facebook.com/marketplace"
+    query = f"{data['brand']} {data['registration']} {data['mileage']}facebook marketplace"
+
+    driver.get("https://www.google.com")
+    handle_cookie_popup(driver)
+
+    search_box = driver.find_element(By.NAME, "q")
+    search_box.send_keys(query)
+    search_box.submit()
+
+    wait = WebDriverWait(driver, 5)
+    wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "h3")))
+
+    search_results = driver.find_elements(By.XPATH, "//h3/ancestor::a")
+    all_links = [link.get_attribute("href") for link in search_results if link.get_attribute("href")]
+
+    fb_links = [link for link in all_links if link and trusted_domain in link]
+    scraped_data_list = []
+
+    if fb_links:
+        fb_link_to_click = fb_links[0]
+        link_element = driver.find_element(By.XPATH, f"//a[@href='{fb_link_to_click}']")
+        wait.until(EC.element_to_be_clickable((By.XPATH, f"//a[@href='{fb_link_to_click}']")))
+        link_element.click()
+"""
+
+"""
+def login_facebook(driver):
+    fb_email = 'haroldahmed431@gmail.com'
+    fb_pass = 'Ajmerian55'
+
+    try:
+        logging.info("Attempting to handle cookie popup")
+        handle_cookie_popup(driver)
+
+        logging.info("Attempting to find email element.")
+        email_elem = driver.find_element(By.ID, "email")
+        email_elem.send_keys(fb_email)
+
+        logging.info("attempting to find password element")
+        pass_elem = driver.find_element(By.ID, "pass")
+        pass_elem.send_keys(fb_pass)
+        
+        pass_elem.send_keys(Keys.RETURN)
+    except Exception as e:
+        logging.error(f"Error while logging into Facebook: {e}")
+"""
