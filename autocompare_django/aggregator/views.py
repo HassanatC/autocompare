@@ -18,8 +18,6 @@ from selenium.webdriver.support import expected_conditions as EC
 
 # Create your views here.
 
-
-
 @api_view(['POST'])
 def main_view(request):
 
@@ -99,7 +97,7 @@ def search_motors_similar(data, driver):
     search_box.send_keys(query)
     search_box.submit()
 
-    wait = WebDriverWait(driver, 5)
+    wait = WebDriverWait(driver, 10)
     wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "h3")))
     
     #finds the relevant motors link
@@ -117,9 +115,6 @@ def search_motors_similar(data, driver):
         link_element = driver.find_element(By.XPATH, f"//a[@href='{motors_link_to_click}']")
         wait.until(EC.element_to_be_clickable((By.XPATH, f"//a[@href='{motors_link_to_click}']")))
         link_element.click()
-
-        print("Pausing for 60 seconds for inspection")
-        time.sleep(5)
     
         try:
             wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".title-3")))
@@ -223,25 +218,3 @@ def handle_cookie_popup(driver):
 
 
 # will work on soon
-
-"""
-def login_facebook(driver):
-    fb_email = 'haroldahmed431@gmail.com'
-    fb_pass = 'Ajmerian55'
-
-    try:
-        logging.info("Attempting to handle cookie popup")
-        handle_cookie_popup(driver)
-
-        logging.info("Attempting to find email element.")
-        email_elem = driver.find_element(By.ID, "email")
-        email_elem.send_keys(fb_email)
-
-        logging.info("attempting to find password element")
-        pass_elem = driver.find_element(By.ID, "pass")
-        pass_elem.send_keys(fb_pass)
-        
-        pass_elem.send_keys(Keys.RETURN)
-    except Exception as e:
-        logging.error(f"Error while logging into Facebook: {e}")
-"""

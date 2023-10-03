@@ -8,7 +8,6 @@ function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [motorsData, setMotorsData] = useState([]);
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -44,7 +43,7 @@ function Home() {
           onChange={handleChange}
           placeholder="Enter the car URL.."
         />
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={isLoading}>Submit</button>
       </form>
 
       {isLoading && (
