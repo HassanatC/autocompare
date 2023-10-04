@@ -163,8 +163,9 @@ def search_motors_similar(data, driver):
     return scraped_data_list
 
 def search_fb(data, driver):
+    #todo: fix the query system and link clicking. way too basic
     trusted_domain = "facebook.com/marketplace"
-    query = f"{data['brand']} {data['registration']} {data['mileage']} facebook marketplace"
+    query = f"{data['brand']} {data['registration']} {data['mileage']} facebook marketplace london"
 
     driver.get("https://www.google.com")
     # search for relevant fb marketplace listing
@@ -190,8 +191,6 @@ def search_fb(data, driver):
 
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR,'div.x78zum5')))
 
-        #sleep engaged for the purpose of inspection
-        time.sleep(2)
 
         price_elements = driver.find_elements(By.CSS_SELECTOR, "span.x78zum5 div span[dir='auto']")
         model_elements = driver.find_elements(By.XPATH, '//span[@class="x1lliihq x6ikm8r x10wlt62 x1n2onr6"]')
