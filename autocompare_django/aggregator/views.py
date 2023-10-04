@@ -9,6 +9,7 @@ from selenium import webdriver
 from selenium.webdriver import Chrome
 import re
 import time
+import json
 import logging
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -163,41 +164,66 @@ def search_motors_similar(data, driver):
 
 def search_fb(data, driver):
     trusted_domain = "facebook.com/marketplace"
-    query = f"{data['brand']} {data['registration']} {data['mileage']}facebook marketplace"
+    query = f"{data['brand']} {data['registration']} {data['mileage']} facebook marketplace"
 
     driver.get("https://www.google.com")
-
+    # search for relevant fb marketplace listing
     search_box = driver.find_element(By.NAME, "q")
     search_box.send_keys(query)
     search_box.submit()
 
-    wait = WebDriverWait(driver, 5)
+    wait = WebDriverWait(driver, 10)
     wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "h3")))
 
     search_results = driver.find_elements(By.XPATH, "//h3/ancestor::a")
     all_links = [link.get_attribute("href") for link in search_results if link.get_attribute("href")]
 
     fb_links = [link for link in all_links if link and trusted_domain in link]
+
     #access fb link similar to how motors does it
+
     if fb_links:
         fb_link_to_click = fb_links[0]
         link_element = driver.find_element(By.XPATH, f"//a[@href='{fb_link_to_click}']")
         wait.until(EC.element_to_be_clickable((By.XPATH, f"//a[@href='{fb_link_to_click}']")))
         link_element.click()
 
-        handle_fb_cookie(driver)
+        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR,'div.x78zum5')))
+
         #sleep engaged for the purpose of inspection
         time.sleep(2)
 
+        price_elements = driver.find_elements(By.CSS_SELECTOR, "span.x78zum5 div span[dir='auto']")
+        model_elements = driver.find_elements(By.XPATH, '//span[@class="x1lliihq x6ikm8r x10wlt62 x1n2onr6"]')
+        mileage_elements = driver.find_elements(By.CSS_SELECTOR, "span.x1lliihq.x6ikm8r.x10wlt62.x1n2onr6.xlyipyv.xuxw1ft.x1j85h84")
+
+        if price_elements and model_elements and mileage_elements:
+            #store data into json
+            scraped_data = []
+
+            for price, model, mileage in zip(price_elements, model_elements, mileage_elements):
+                scraped_data.append({
+                    "Price": price.text,
+                    "Model": model.text,
+                    "Mileage": mileage.text
+                })
+
+            print(json.dumps(scraped_data, indent=4))
+
+        else:
+            print("Elements not found")
+
+"""
 def handle_fb_cookie(driver):
     try:
         accept_button = WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.XPATH, "//span[text()='Allow all cookies']"))
+            EC.element_to_be_clickable((By.XPATH, "//div[@aria-label='Allow all cookies']"))
         )
+
         accept_button.click()
     except Exception as e:
         print(f"Error handling cookie popup: {e}")
-
+"""
 def sort_scraped_data_by_price(scraped_data_list):
     #method to sort the returned data by cheapest first. currently the standard
     scraped_data_list = [
