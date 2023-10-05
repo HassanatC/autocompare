@@ -16,6 +16,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
+from urllib.parse import urljoin
 
 # Create your views here.
 
@@ -157,15 +158,16 @@ def search_motors_similar(data, driver):
             }
 
     print("Motors Link:", motors_links)
-    print("Scraped Data:", scraped_data_list)
 
     scraped_data_list = sort_scraped_data_by_price(scraped_data_list)
     return scraped_data_list
 
+
+
 def search_fb(data, driver):
     #todo: fix the query system and link clicking. way too basic
     trusted_domain = "facebook.com/marketplace"
-    query = f"{data['brand']} {data['registration']} {data['mileage']} facebook marketplace london"
+    query = f"facebook marketplace london used {data['brand']} {data['registration']} {data['mileage']} for sale"
 
     driver.get("https://www.google.com")
     # search for relevant fb marketplace listing
@@ -180,37 +182,46 @@ def search_fb(data, driver):
     all_links = [link.get_attribute("href") for link in search_results if link.get_attribute("href")]
 
     fb_links = [link for link in all_links if link and trusted_domain in link]
+    scraped_data_list = []
 
     #access fb link similar to how motors does it
 
     if fb_links:
-        fb_link_to_click = fb_links[0]
+        fb_link_to_click = fb_links[1]
         link_element = driver.find_element(By.XPATH, f"//a[@href='{fb_link_to_click}']")
         wait.until(EC.element_to_be_clickable((By.XPATH, f"//a[@href='{fb_link_to_click}']")))
         link_element.click()
 
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR,'div.x78zum5')))
 
-
         price_elements = driver.find_elements(By.CSS_SELECTOR, "span.x78zum5 div span[dir='auto']")
         model_elements = driver.find_elements(By.XPATH, '//span[@class="x1lliihq x6ikm8r x10wlt62 x1n2onr6"]')
         mileage_elements = driver.find_elements(By.CSS_SELECTOR, "span.x1lliihq.x6ikm8r.x10wlt62.x1n2onr6.xlyipyv.xuxw1ft.x1j85h84")
+        link_elements = driver.find_elements(By.XPATH, "//div[@class='x3ct3a4']//a[contains(@class, 'x1i10hfl')]")
 
-        if price_elements and model_elements and mileage_elements:
-            #store data into json
+
+
+
+        if price_elements and model_elements and mileage_elements and link_elements:
+            #goes through elements and returns the data
             scraped_data = []
+            for price, model, mileage, link in zip(price_elements, model_elements, mileage_elements, link_elements):
 
-            for price, model, mileage in zip(price_elements, model_elements, mileage_elements):
+                relative_link = link.get_attribute("href")
+                absolute_link = urljoin("https://www.facebook.com", relative_link)
                 scraped_data.append({
                     "Price": price.text,
                     "Model": model.text,
-                    "Mileage": mileage.text
+                    "Mileage": mileage.text,
+                    "Link": absolute_link
                 })
+                scraped_data_list.append(scraped_data)
 
-            print(json.dumps(scraped_data, indent=4))
-
+            print(scraped_data_list)
         else:
             print("Elements not found")
+        
+        return scraped_data_list
 
 """
 def handle_fb_cookie(driver):
@@ -242,6 +253,5 @@ def handle_cookie_popup(driver):
         accept_button.click()
     except Exception as e:
         print(f"Error handling cookie popup: {e}")
-
 
 # will work on soon
