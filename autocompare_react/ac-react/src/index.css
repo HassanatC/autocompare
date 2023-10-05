@@ -1,9 +1,9 @@
 :root {
-  --primary-color: #095eb9;
+  --primary-color: #0c55a2;
   --hover-color: #2e6cb9;
-  --neutral-light: #ffffff;
-  --neutral-dark: #f0f0f0;
-  --border-color: #999;
+  --neutral-light: #faf9f9;
+  --neutral-dark: #9c3838;
+  --border-color: #a79d9d;
   --font-family-primary: 'Nunito', sans-serif;
   --font-family-secondary: 'Roboto', sans-serif;
 }
@@ -19,11 +19,12 @@ body {
 
 p, h2 {
   font-family: var(--font-family-secondary);
+  font-size: 18px;
   margin-bottom: 16px;
 }
 
 h2 {
-  font-size: 24px;
+  font-size: 32px;
   font-weight: 600;
 }
 
@@ -33,12 +34,12 @@ h2 {
   border: 2px solid var(--border-color);
   max-width: 850px;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(42, 42, 42, 0.15);
+  box-shadow: 0 4px 8px rgba(104, 101, 101, 0.15);
   background-color: var(--neutral-light);
 }
 
 .header {
-  font-size: 32px;
+  font-size: 40px;
   font-weight: bold;
   text-align: center;
   padding: 1rem;
@@ -102,6 +103,7 @@ h2 {
   border-radius: 8px;
   margin-top: 20px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: red;
 }
 
 .data-section {
@@ -110,8 +112,8 @@ h2 {
 }
 
 .motors-section {
-  background-color: #f1f5fdb6;
-  border: 1px solid var(--border-color);
+  background-color: #f3ebf890;
+  border: 1.5px solid var(--border-color);
 }
 
 .motors-section img {
@@ -121,5 +123,6 @@ h2 {
 }
 
 .motors-section img:hover {
-  transform: scale(1.05);
+  transition: all 0.2s ease;
+  transform: scale(1.025);
 }
