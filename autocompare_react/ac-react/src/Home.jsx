@@ -72,13 +72,13 @@ function Home() {
           {motorsData.map((item, index) => (
             <div className="motors-section" key={index}>
               
-              {/* Wrapped the image with an anchor tag */}
               <a href={item.link} target="_blank" rel="noopener noreferrer">
                 <img src={item.thumbnail_image} alt={`Motor deal ${index + 1}`} />
               </a>
               
               <p>Price: £{item.price}</p>
               <p>Mileage: {item.mileage} miles</p>
+              <p>Model: {item.model}</p>
               <p>Deal: <a href={item.link} target="_blank" rel="noopener noreferrer">{item.link}</a></p>
             </div>
           ))}

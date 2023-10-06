@@ -131,6 +131,7 @@ def search_motors_similar(data, driver):
             price_elements = driver.find_elements(By.CSS_SELECTOR, ".title-3")
 
             # loops through the price elements in motors. finds them and scrapes
+
             for price_element in price_elements:
                 parent_element = price_element.find_element(By.XPATH, "./ancestor::div[contains(@class, 'result-card box-shadow-hover')]")
 
@@ -144,6 +145,9 @@ def search_motors_similar(data, driver):
                 mileage = mileage_element.text
                 print(f"Mileage element found. Text: {mileage}")
 
+                model_element = parent_element.find_element(By.CSS_SELECTOR, "span.color-j.line-clamp-1.body-text")
+                model = model_element.text
+
                 image_element = parent_element.find_element(By.CSS_SELECTOR, ".result-card__image-container .lazy img")
                 #grabs first image
                 thumbnail_image = image_element.get_attribute('src')
@@ -152,6 +156,7 @@ def search_motors_similar(data, driver):
                 'price': price,
                 'link': link,
                 'mileage': mileage,
+                'model': model,
                 'thumbnail_image': thumbnail_image
                 }
                 scraped_data_list.append(scraped_data)
@@ -165,7 +170,6 @@ def search_motors_similar(data, driver):
 
     print("Motors Link:", motors_links)
     return scraped_data_list
-
 
 def search_fb(data, driver):
     #todo: fix the query system and link clicking. way too basic
@@ -197,11 +201,10 @@ def search_fb(data, driver):
 
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR,'div.x78zum5')))
 
-        price_elements = driver.find_elements(By.CSS_SELECTOR, "span.x78zum5 div span[dir='auto']")
+        price_elements = driver.find_elements(By.XPATH, "//div[@class='x1gslohp xkh6y0r']//span[@dir='auto']")
         model_elements = driver.find_elements(By.XPATH, '//span[@class="x1lliihq x6ikm8r x10wlt62 x1n2onr6"]')
         mileage_elements = driver.find_elements(By.CSS_SELECTOR, "span.x1lliihq.x6ikm8r.x10wlt62.x1n2onr6.xlyipyv.xuxw1ft.x1j85h84")
         link_elements = driver.find_elements(By.XPATH, "//div[@class='x3ct3a4']//a[contains(@class, 'x1i10hfl')]")
-
 
         if price_elements and model_elements and mileage_elements and link_elements:
             #goes through elements and returns the data
@@ -210,10 +213,12 @@ def search_fb(data, driver):
 
                 relative_link = link.get_attribute("href")
                 absolute_link = urljoin("https://www.facebook.com", relative_link)
+                mileage_text = mileage.text if 'km' in mileage.text else 'N/A'
+
                 scraped_data_list.append({
                     "price": price.text,
                     "model": model.text,
-                    "mileage": mileage.text,
+                    "mileage": mileage_text,
                     "link": absolute_link
                 })
 
@@ -228,12 +233,18 @@ def merge_data_lists(existing_data_list, scraped_data_list):
 
 def sort_scraped_data_by_price(motors_data, fb_data):
     #sort the lists and return
-    for item in motors_data + fb_data:
-        if 'price' in item:
-            item['price'] = float(item['price'].replace('£', '').replace(',', ''))
+    for data_list in [motors_data, fb_data]:
+        for item in data_list:
+            if 'price' in item:
+                try:
+                    item['price'] = float(item['price'].replace('£', '').replace(',', ''))
+                except ValueError:
+                    item['price'] = "N/A"
 
-    sorted_motors_data = sorted(motors_data, key=lambda x: x.get('price', float('inf')))[:7]
-    sorted_fb_data = sorted(fb_data, key=lambda x: x.get('price', float('inf')))[:7]
+    sorted_motors_data = sorted(motors_data, key=lambda x: float(x.get('price', float('inf'))) if isinstance(x.get('price'), float) else float('inf'))[:7]
+
+    sorted_fb_data = sorted(fb_data, key=lambda x: float(x.get('price', float('inf'))) if isinstance(x.get('price'), float) else float('inf'))[:7]
+
     merge_sorted_data = sorted_motors_data + sorted_fb_data
 
     return merge_sorted_data
