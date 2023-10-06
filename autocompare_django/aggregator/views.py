@@ -28,12 +28,18 @@ def main_view(request):
         if form.is_valid():
             url = form.cleaned_data['url']
             driver = Chrome()
+
             data = scrape_car_data(url, driver)
+
             motors_data = search_motors_similar(data, driver)
-            search_fb(data, driver)
+
+            fb_data = search_fb(data, driver)
 
             driver.quit()
-            return Response({"data": data, "motors_data": motors_data}, status=200)
+        
+            sorted_data = sort_scraped_data_by_price(motors_data, fb_data)
+
+            return Response({"data": data, "motors_data": sorted_data}, status=200)
         else:
             return Response({"error": "Invalid form"}, status=400)
     else:
@@ -158,10 +164,7 @@ def search_motors_similar(data, driver):
             }
 
     print("Motors Link:", motors_links)
-
-    scraped_data_list = sort_scraped_data_by_price(scraped_data_list)
     return scraped_data_list
-
 
 
 def search_fb(data, driver):
@@ -200,22 +203,19 @@ def search_fb(data, driver):
         link_elements = driver.find_elements(By.XPATH, "//div[@class='x3ct3a4']//a[contains(@class, 'x1i10hfl')]")
 
 
-
-
         if price_elements and model_elements and mileage_elements and link_elements:
             #goes through elements and returns the data
-            scraped_data = []
+            scraped_data_list = []
             for price, model, mileage, link in zip(price_elements, model_elements, mileage_elements, link_elements):
 
                 relative_link = link.get_attribute("href")
                 absolute_link = urljoin("https://www.facebook.com", relative_link)
-                scraped_data.append({
-                    "Price": price.text,
-                    "Model": model.text,
-                    "Mileage": mileage.text,
-                    "Link": absolute_link
+                scraped_data_list.append({
+                    "price": price.text,
+                    "model": model.text,
+                    "mileage": mileage.text,
+                    "link": absolute_link
                 })
-                scraped_data_list.append(scraped_data)
 
             print(scraped_data_list)
         else:
@@ -223,27 +223,21 @@ def search_fb(data, driver):
         
         return scraped_data_list
 
-"""
-def handle_fb_cookie(driver):
-    try:
-        accept_button = WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.XPATH, "//div[@aria-label='Allow all cookies']"))
-        )
+def merge_data_lists(existing_data_list, scraped_data_list):
+    return existing_data_list + scraped_data_list
 
-        accept_button.click()
-    except Exception as e:
-        print(f"Error handling cookie popup: {e}")
-"""
-def sort_scraped_data_by_price(scraped_data_list):
-    #method to sort the returned data by cheapest first. currently the standard
-    scraped_data_list = [
-        {k: float(v.replace('£', '').replace(',', '')) if k == 'price' else v for k, v in item.items()}
-        for item in scraped_data_list
-    ]
+def sort_scraped_data_by_price(motors_data, fb_data):
+    #sort the lists and return
+    for item in motors_data + fb_data:
+        if 'price' in item:
+            item['price'] = float(item['price'].replace('£', '').replace(',', ''))
 
-    #sort the list of dictionaries
-    sorted_list = sorted(scraped_data_list, key=lambda x: x['price'])
-    return sorted_list[:10]
+    sorted_motors_data = sorted(motors_data, key=lambda x: x.get('price', float('inf')))[:7]
+    sorted_fb_data = sorted(fb_data, key=lambda x: x.get('price', float('inf')))[:7]
+    merge_sorted_data = sorted_motors_data + sorted_fb_data
+
+    return merge_sorted_data
+
 
 def handle_cookie_popup(driver):
     try:
@@ -254,4 +248,3 @@ def handle_cookie_popup(driver):
     except Exception as e:
         print(f"Error handling cookie popup: {e}")
 
-# will work on soon
