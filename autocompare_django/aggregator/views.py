@@ -39,7 +39,8 @@ def main_view(request):
         
             sorted_data = sort_scraped_data_by_price(motors_data, fb_data)
 
-            return Response({"data": data, "motors_data": sorted_data}, status=200)
+            return Response({"data": data,
+                              "motors_data": sorted_data}, status=200)
         else:
             return Response({"error": "Invalid form"}, status=400)
     else:
@@ -172,7 +173,6 @@ def search_motors_similar(data, driver):
     return scraped_data_list
 
 def search_fb(data, driver):
-    #todo: fix the query system and link clicking. way too basic
     trusted_domain = "facebook.com/marketplace"
     query = f"facebook marketplace london used {data['brand']} {data['registration']} {data['mileage']} for sale"
 

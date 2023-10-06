@@ -98,12 +98,11 @@ h2 {
   cursor: not-allowed;
 }
 
-.data-section, .motors-section {
+.data-section, .motors-section, .fb-section {
   padding: 20px;
   border-radius: 8px;
   margin-top: 20px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  background-color: red;
 }
 
 .data-section {
@@ -112,8 +111,13 @@ h2 {
 }
 
 .motors-section {
-  background-color: #f3ebf890;
+  background-color: #e4f3e956;
   border: 1.5px solid var(--border-color);
+}
+
+.fb-section {
+  background-color: #cccef451;
+  border: 1.5px solid var(--border-color) 
 }
 
 .motors-section img {

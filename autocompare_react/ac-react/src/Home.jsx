@@ -33,6 +33,9 @@ function Home() {
     setFormData({ ...formData, [name]: value })
   };
 
+  const motorsDeals = motorsData.filter(item => item.link.includes("motors.co.uk"));
+  const fbDeals = motorsData.filter(item => item.link.includes("facebook.com"));
+
   return (
     <div className="form-container">
       <header className="header">AutoCompare</header>
@@ -66,10 +69,10 @@ function Home() {
       )}
 
       {/*renders the list of suggested motors*/}
-      {motorsData && motorsData.length > 0 && (
+      {motorsDeals && motorsDeals.length > 0 && (
         <div>
           <h2>Motors Deals:</h2>
-          {motorsData.map((item, index) => (
+          {motorsDeals.map((item, index) => (
             <div className="motors-section" key={index}>
               
               <a href={item.link} target="_blank" rel="noopener noreferrer">
@@ -84,6 +87,26 @@ function Home() {
           ))}
         </div>
       )}
+
+        {fbDeals.length > 0 && (
+          <div>
+          <h2>Facebook Marketplace Deals:</h2>
+          {fbDeals.map((item, index) => (
+            <div className="fb-section" key={index}>
+              
+              <a href={item.link} target="_blank" rel="noopener noreferrer">
+                <img src={item.thumbnail_image} alt={`Motor deal ${index + 1}`} />
+              </a>
+              
+              <p>Price: £{item.price}</p>
+              <p>Mileage: {item.mileage} miles</p>
+              <p>Model: {item.model}</p>
+              <p>Deal: <a href={item.link} target="_blank" rel="noopener noreferrer">{item.link}</a></p>
+              </div>
+          ))}
+        </div>
+      )}
+
     </div>
   );
 }
