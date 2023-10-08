@@ -31,6 +31,7 @@ h2 {
 .form-container {
   margin: 40px auto;
   padding: 20px;
+  margin-top: 100px;
   border: 2px solid var(--border-color);
   max-width: 850px;
   border-radius: 8px;
@@ -129,4 +130,42 @@ h2 {
 .motors-section img:hover {
   transition: all 0.2s ease;
   transform: scale(1.025);
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #4d4c4c;
+  overflow: auto;
+  z-index: 1000;
+}
+
+.navbar ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.navbar ul li {
+  float: left;
+}
+
+.navbar ul li a {
+  display: block;
+  padding: 14px 20px;
+  text-align: center;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+}
+
+.navbar ul li a:hover {
+  background-color: #7c7a7a;
+  transition: all 0.1s ease;
+}
+
+.navbar ul li a.active {
+  background-color: #4CAF50;
+  color: white;
 }
