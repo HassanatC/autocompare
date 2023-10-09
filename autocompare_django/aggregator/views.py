@@ -174,7 +174,7 @@ def search_motors_similar(data, driver):
 
 def search_fb(data, driver):
     trusted_domain = "facebook.com/marketplace"
-    query = f"facebook marketplace london used {data['brand']} {data['mileage']} for sale"
+    query = f"facebook marketplace london used {data['brand']} {data['registration']} {data['mileage']} for sale"
 
     driver.get("https://www.google.com")
 
@@ -190,9 +190,9 @@ def search_fb(data, driver):
     #search for relevant link, use xpath and query to find and crawl
     search_results = driver.find_elements(By.XPATH, "//h3/ancestor::a")
     correct_link = None
-    brand_keywords = set(data['brand'].split())
-    location_keywords = {'for sale in', 'near'}
 
+    first_brand_keyword = data['brand'].split()[0]
+    
     for link_element in search_results:
         link_url = link_element.get_attribute("href") or ""
         try:
@@ -204,7 +204,7 @@ def search_fb(data, driver):
     
         link_text_keywords = set(link_text.split())
 
-        if trusted_domain in link_url and brand_keywords.issubset(link_text_keywords) and any(keyword in link_text for keyword in location_keywords):
+        if trusted_domain in link_url and first_brand_keyword in link_text_keywords:
             correct_link = link_url
             break
 
@@ -216,23 +216,25 @@ def search_fb(data, driver):
         model_elements = driver.find_elements(By.XPATH, '//span[@class="x1lliihq x6ikm8r x10wlt62 x1n2onr6"]')
         mileage_elements = driver.find_elements(By.CSS_SELECTOR, "span.x1lliihq.x6ikm8r.x10wlt62.x1n2onr6.xlyipyv.xuxw1ft.x1j85h84")
         link_elements = driver.find_elements(By.XPATH, "//div[@class='x3ct3a4']//a[contains(@class, 'x1i10hfl')]")
+        image_elements = driver.find_elements(By.CSS_SELECTOR, "img.xt7dq6l.xl1xv1r.x6ikm8r.x10wlt62.xh8yej3")
 
-        if price_elements and model_elements and mileage_elements and link_elements:
+        if price_elements and model_elements and mileage_elements and link_elements and image_elements:
             #goes through elements and returns the data
-            for price, model, mileage, link in zip(price_elements, model_elements, mileage_elements, link_elements):
+            for price, model, mileage, link, image in zip(price_elements, model_elements, mileage_elements, link_elements, image_elements):
 
                 relative_link = link.get_attribute("href")
                 absolute_link = urljoin("https://www.facebook.com", relative_link)
                 mileage_text = mileage.text if 'km' in mileage.text else 'N/A'
+                image_url = image.get_attribute('src')
 
                 scraped_data_list.append({
                     "price": price.text,
                     "model": model.text,
                     "mileage": mileage_text,
-                    "link": absolute_link
+                    "link": absolute_link,
+                    "image": image_url
                 })
 
-            print(scraped_data_list)
         else:
             print("Elements not found")
         

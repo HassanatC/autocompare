@@ -10,16 +10,16 @@
 
 body {
   font-family: var(--font-family-primary);
-  font-size: 16px;
   background-color: #e6e9ed;
   color: #333;
   margin: 0;
   padding: 0;
 }
 
-p, h2 {
+p {
   font-family: var(--font-family-secondary);
-  font-size: 18px;
+  font-size: 20px;
+  font-weight: bold;
   margin-bottom: 16px;
 }
 
@@ -112,12 +112,12 @@ h2 {
 }
 
 .motors-section {
-  background-color: #e4f3e956;
+  background-color: #e4f3e942;
   border: 1.5px solid var(--border-color);
 }
 
 .fb-section {
-  background-color: #cccef451;
+  background-color: #d7d8ed51;
   border: 1.5px solid var(--border-color) 
 }
 
