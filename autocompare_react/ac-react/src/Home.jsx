@@ -6,6 +6,8 @@ function Home() {
   const [formData, setFormData] = useState({ url: '' });
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isScrapeDone, setIsScrapeDone] = useState(false);
+  const [serverMessage, setServerMessage] = useState("");
   const [motorsData, setMotorsData] = useState([]);
 
   const handleSubmit = async (e) => {
@@ -20,10 +22,16 @@ function Home() {
       });
       setData(response.data.data);
       setMotorsData(response.data.motors_data);
+      setIsScrapeDone(true);
+      if (response.data.error) {
+        setServerMessage(response.data.error);
+      }
     } catch (error) {
       console.error("Error with submission: ", error)
+      setServerMessage("An error occurred while fetching data.");
       setIsLoading(false);
     } finally {
+      setIsScrapeDone(true);
       setIsLoading(false);
     }
   };
@@ -89,24 +97,31 @@ function Home() {
         </div>
       )}
 
-        {fbDeals.length > 0 && (
+        {isScrapeDone && (fbDeals && fbDeals.length > 0 ? (
           <div>
-          <h2>Facebook Marketplace Deals:</h2>
-          {fbDeals.map((item, index) => (
-            <div className="fb-section" key={index}>
-              
-              <a href={item.link} target="_blank" rel="noopener noreferrer">
-                <img src={item.thumbnail_image} alt={`Motor deal ${index + 1}`} />
-              </a>
-              
-              <p>Price: £{item.price}</p>
-              <p>Mileage: {item.mileage} miles</p>
-              <p>Model: {item.model}</p>
-              <p>Deal: <a href={item.link} target="_blank" rel="noopener noreferrer">{item.link}</a></p>
-              </div>
+            <h2>Facebook Marketplace Deals:</h2>
+            {fbDeals.map((item, index) => (
+              <div className="fb-section" key={index}>
+                
+                <a href={item.link} target="_blank" rel="noopener noreferrer">
+                  <img src={item.thumbnail_image} alt={`Facebook Deal ${index + 1}`} />
+                </a>
+                
+                <p>Price: £{item.price}</p>
+                <p>Mileage: {item.mileage} miles</p>
+                <p>Model: {item.model}</p>
+                <p>Deal: <a href={item.link} target="_blank" rel="noopener noreferrer">{item.link}</a></p>
+            </div>
           ))}
         </div>
-      )}
+      ) : (
+        <div>
+          <h2>Facebook Marketplace Deals</h2>
+          <p>No deals are available from Facebook Marketplace.</p>
+          {serverMessage && <div className="server-message">{serverMessage}</div>}
+
+        </div>
+      ))}
 
     </div>
   );

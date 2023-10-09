@@ -7,16 +7,16 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from selenium import webdriver
 from selenium.webdriver import Chrome
-import re
-import time
-import json
-import logging
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
 from urllib.parse import urljoin
+import re
+import time
+import json
 
 # Create your views here.
 
@@ -30,12 +30,12 @@ def main_view(request):
             driver = Chrome()
 
             data = scrape_car_data(url, driver)
-
             motors_data = search_motors_similar(data, driver)
-
             fb_data = search_fb(data, driver)
-
             driver.quit()
+
+            if not fb_data:
+                return Response({"error": "FB Marketplace data could not be scraped"}, status=500)
         
             sorted_data = sort_scraped_data_by_price(motors_data, fb_data)
 
@@ -174,10 +174,10 @@ def search_motors_similar(data, driver):
 
 def search_fb(data, driver):
     trusted_domain = "facebook.com/marketplace"
-    query = f"facebook marketplace london used {data['brand']} {data['registration']} {data['mileage']} for sale"
+    query = f"facebook marketplace london used {data['brand']} {data['mileage']} for sale"
 
     driver.get("https://www.google.com")
-    # search for relevant fb marketplace listing
+
     search_box = driver.find_element(By.NAME, "q")
     search_box.send_keys(query)
     search_box.submit()
@@ -185,21 +185,32 @@ def search_fb(data, driver):
     wait = WebDriverWait(driver, 10)
     wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "h3")))
 
-    search_results = driver.find_elements(By.XPATH, "//h3/ancestor::a")
-    all_links = [link.get_attribute("href") for link in search_results if link.get_attribute("href")]
-
-    fb_links = [link for link in all_links if link and trusted_domain in link]
     scraped_data_list = []
 
-    #access fb link similar to how motors does it
+    #search for relevant link, use xpath and query to find and crawl
+    search_results = driver.find_elements(By.XPATH, "//h3/ancestor::a")
+    correct_link = None
+    brand_keywords = set(data['brand'].split())
+    location_keywords = {'for sale in', 'near'}
 
-    if fb_links:
-        fb_link_to_click = fb_links[1]
-        link_element = driver.find_element(By.XPATH, f"//a[@href='{fb_link_to_click}']")
-        wait.until(EC.element_to_be_clickable((By.XPATH, f"//a[@href='{fb_link_to_click}']")))
-        link_element.click()
+    for link_element in search_results:
+        link_url = link_element.get_attribute("href") or ""
+        try:
+            h3_element = link_element.find_element(By.XPATH, "./h3")
+            link_text = h3_element.text if h3_element else ""
+        except NoSuchElementException:
+            print(f"No h3 element found for {link_url}")
+            continue
+    
+        link_text_keywords = set(link_text.split())
 
-        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR,'div.x78zum5')))
+        if trusted_domain in link_url and brand_keywords.issubset(link_text_keywords) and any(keyword in link_text for keyword in location_keywords):
+            correct_link = link_url
+            break
+
+    if correct_link:
+        driver.get(correct_link)
+        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div.x78zum5')))
 
         price_elements = driver.find_elements(By.XPATH, "//div[@class='x1gslohp xkh6y0r']//span[@dir='auto']")
         model_elements = driver.find_elements(By.XPATH, '//span[@class="x1lliihq x6ikm8r x10wlt62 x1n2onr6"]')
@@ -208,7 +219,6 @@ def search_fb(data, driver):
 
         if price_elements and model_elements and mileage_elements and link_elements:
             #goes through elements and returns the data
-            scraped_data_list = []
             for price, model, mileage, link in zip(price_elements, model_elements, mileage_elements, link_elements):
 
                 relative_link = link.get_attribute("href")
