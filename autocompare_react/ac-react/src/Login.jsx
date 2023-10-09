@@ -6,11 +6,11 @@ function Login() {
             <div className="header">Login</div>
             <form className="url-form">
                 <label>
-                    <p>Email:</p>
+                    <p className="reg-text">Email:</p>
                     <input type="email" placeholder="Enter your email" required />
                 </label>
                 <label>
-                    <p>Password:</p>
+                    <p className="reg-text">Password:</p>
                     <input type="password" placeholder="Enter your password" required />
                 </label>
                 <button type="submit">Login</button>

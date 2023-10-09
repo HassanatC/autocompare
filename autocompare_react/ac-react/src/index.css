@@ -4,7 +4,7 @@
   --neutral-light: #faf9f9;
   --neutral-dark: #9c3838;
   --border-color: #a79d9d;
-  --font-family-primary: 'Nunito', sans-serif;
+  --font-family-primary: 'Roboto', sans-serif;
   --font-family-secondary: 'Roboto', sans-serif;
 }
 
@@ -19,13 +19,11 @@ body {
 p {
   font-family: var(--font-family-secondary);
   font-size: 20px;
-  font-weight: bold;
   margin-bottom: 16px;
 }
 
 h2 {
   font-size: 32px;
-  font-weight: 600;
 }
 
 .form-container {
@@ -41,10 +39,13 @@ h2 {
 
 .header {
   font-size: 40px;
-  font-weight: bold;
   text-align: center;
   padding: 1rem;
   color: var(--primary-color);
+}
+
+.top-info {
+  font-size: 22px;
 }
 
 .url-form {
@@ -80,13 +81,16 @@ h2 {
 }
 
 .url-form button {
+  margin-top: 20px;
   padding: 10px 20px;
+  width: 125px;
+  height: 50px;
   background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 22px;
   transition: background-color 0.3s ease;
 }
 
@@ -97,6 +101,10 @@ h2 {
 .url-form button:disabled {
   background-color: var(--border-color);
   cursor: not-allowed;
+}
+
+.reg-text {
+  margin-top: 5px;
 }
 
 .data-section, .motors-section, .fb-section {
@@ -112,7 +120,7 @@ h2 {
 }
 
 .motors-section {
-  background-color: #e4f3e942;
+  background-color: #ebf4f242;
   border: 1.5px solid var(--border-color);
 }
 

@@ -48,6 +48,7 @@ function Home() {
     <div className="form-container">
 
       <header className="header">AutoCompare</header>
+      <p className="top-info">Simply enter the URL of an AutoTrader car that you like, and we will find you better deals. For completely free.</p>
       <form className="url-form" onSubmit={handleSubmit}>
         <input
           type="text"
