@@ -8,7 +8,7 @@ function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isScrapeDone, setIsScrapeDone] = useState(false);
   const [serverMessage, setServerMessage] = useState("");
-  const [motorsData, setMotorsData] = useState([]);
+  const [fbData, setFbData] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,7 +21,7 @@ function Home() {
         },
       });
       setData(response.data.data);
-      setMotorsData(response.data.motors_data);
+      setFbData(response.data.fb_data);
       setIsScrapeDone(true);
       if (response.data.error) {
         setServerMessage(response.data.error);
@@ -41,9 +41,6 @@ function Home() {
     setFormData({ ...formData, [name]: value })
   };
 
-  const motorsDeals = motorsData.filter(item => item.link.includes("motors.co.uk"));
-  const fbDeals = motorsData.filter(item => item.link.includes("facebook.com"));
-
   return (
     <div className="form-container">
 
@@ -62,6 +59,12 @@ function Home() {
 
       {isLoading && (
         <div className="loading-text">
+          <div className="lds-ring">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+            </div>
           <p>Please wait while we fetch relevant deals!</p>
         </div>
       )}
@@ -77,38 +80,19 @@ function Home() {
           <p>Previous Owners: {data.previous_owners}</p>
         </div>
       )}
+    
 
-      {/*renders the list of suggested motors*/}
-      {motorsDeals && motorsDeals.length > 0 && (
-        <div>
-          <h2>Motors Deals:</h2>
-          {motorsDeals.map((item, index) => (
-            <div className="motors-section" key={index}>
-              
-              <a href={item.link} target="_blank" rel="noopener noreferrer">
-                <img src={item.thumbnail_image} alt={`Motor deal ${index + 1}`} />
-              </a>
-              
-              <p>Price: £{item.price}</p>
-              <p>Mileage: {item.mileage} miles</p>
-              <p>Model: {item.model}</p>
-              <p>Deal: <a href={item.link} target="_blank" rel="noopener noreferrer">{item.link}</a></p>
-            </div>
-          ))}
-        </div>
-      )}
-
-        {isScrapeDone && (fbDeals && fbDeals.length > 0 ? (
+        {isScrapeDone && (fbData && fbData.length > 0 ? (
           <div>
             <h2>Facebook Marketplace Deals:</h2>
-            {fbDeals.map((item, index) => (
+            {fbData.map((item, index) => (
               <div className="fb-section" key={index}>
                 
                 <a href={item.link} target="_blank" rel="noopener noreferrer">
                   <img src={item.image} className="scraped-car-img" alt={`Facebook Deal ${index + 1}`} />
                 </a>
                 
-                <p>Price: £{item.price}</p>
+                <p>Price: {item.price}</p>
                 <p>Mileage: {item.mileage} mileage</p>
                 <p>Model: {item.model}</p>
                 <p>Deal: <a href={item.link} target="_blank" rel="noopener noreferrer">{item.link}</a></p>

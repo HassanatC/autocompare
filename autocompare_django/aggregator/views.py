@@ -22,7 +22,6 @@ import json
 
 @api_view(['POST'])
 def main_view(request):
-
     if request.method == 'POST':
         form = CarURLForm(request.data)
         if form.is_valid():
@@ -30,17 +29,14 @@ def main_view(request):
             driver = Chrome()
 
             data = scrape_car_data(url, driver)
-            motors_data = search_motors_similar(data, driver)
             fb_data = search_fb(data, driver)
             driver.quit()
 
             if not fb_data:
                 return Response({"error": "FB Marketplace data could not be scraped"}, status=500)
-        
-            sorted_data = sort_scraped_data_by_price(motors_data, fb_data)
 
             return Response({"data": data,
-                              "motors_data": sorted_data}, status=200)
+                              "fb_data": fb_data}, status=200)
         else:
             return Response({"error": "Invalid form"}, status=400)
     else:
@@ -95,6 +91,7 @@ def scrape_car_data(url, driver):
 
     return data
 
+"""
 def search_motors_similar(data, driver):
     trusted_domain = "motors.co.uk"
     query = f"{data['brand']} {data['registration']} with {data['mileage']} for sale Motors UK"
@@ -171,12 +168,15 @@ def search_motors_similar(data, driver):
 
     print("Motors Link:", motors_links)
     return scraped_data_list
+"""
 
 def search_fb(data, driver):
     trusted_domain = "facebook.com/marketplace"
     query = f"facebook marketplace london used {data['brand']} {data['registration']} {data['mileage']} for sale"
 
     driver.get("https://www.google.com")
+
+    handle_cookie_popup(driver)
 
     search_box = driver.find_element(By.NAME, "q")
     search_box.send_keys(query)
@@ -236,31 +236,23 @@ def search_fb(data, driver):
                 "image": image_url
             })
             except NoSuchElementException:
-                print("Some elements not found for a parent div")
                 continue
         return scraped_data_list
 
 def merge_data_lists(existing_data_list, scraped_data_list):
     return existing_data_list + scraped_data_list
 
-def sort_scraped_data_by_price(motors_data, fb_data):
+def sort_scraped_data_by_price(fb_data):
     #sort the lists and return
-    for data_list in [motors_data, fb_data]:
-        for item in data_list:
-            if 'price' in item:
-                try:
-                    item['price'] = float(item['price'].replace('£', '').replace(',', ''))
-                except ValueError:
-                    item['price'] = "N/A"
-
-    sorted_motors_data = sorted(motors_data, key=lambda x: float(x.get('price', float('inf'))) if isinstance(x.get('price'), float) else float('inf'))[:7]
-
-    sorted_fb_data = sorted(fb_data, key=lambda x: float(x.get('price', float('inf'))) if isinstance(x.get('price'), float) else float('inf'))[:7]
-
-    merge_sorted_data = sorted_motors_data + sorted_fb_data
-
-    return merge_sorted_data
-
+    for item in fb_data:
+        if 'price' in item:
+            try:
+                item['price'] = float(item['price'].replace('£', '').replace(',', ''))
+            except ValueError:
+                item['price'] = "N/A"
+    
+    sorted_fb_data = sorted(fb_data, key=lambda x: float(x.get('price', float('inf'))) if isinstance(x.get('price'), float) else float('inf'))[:10]
+    return sorted_fb_data
 
 def handle_cookie_popup(driver):
     try:
