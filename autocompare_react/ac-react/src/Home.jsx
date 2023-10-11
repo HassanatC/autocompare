@@ -109,7 +109,7 @@ function Home() {
                 </a>
                 
                 <p>Price: £{item.price}</p>
-                <p>Mileage: {item.mileage} miles</p>
+                <p>Mileage: {item.mileage} mileage</p>
                 <p>Model: {item.model}</p>
                 <p>Deal: <a href={item.link} target="_blank" rel="noopener noreferrer">{item.link}</a></p>
             </div>

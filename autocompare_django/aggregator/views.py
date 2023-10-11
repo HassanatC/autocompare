@@ -219,7 +219,7 @@ def search_fb(data, driver):
             try:
                 price_element = parent.find_element(By.XPATH, ".//span[@dir='auto' and contains(@class, 'x193iq5w')]")
                 model_element = parent.find_element(By.XPATH, ".//span[@class='x1lliihq x6ikm8r x10wlt62 x1n2onr6']")
-                mileage_element = parent.find_element(By.XPATH, ".//span[@class='x1lliihq x6ikm8r x10wlt62 x1n2onr6 xlyipyv xuxw1ft x1j85h84']")
+                mileage_element = parent.find_element(By.XPATH, ".//span[contains(@class, 'xlyipyv xuxw1ft x1j85h84') and contains(text(), 'km')]")
                 link_element = parent.find_element(By.XPATH, ".//a[contains(@class, 'x1i10hfl')]")
                 image_element = parent.find_element(By.XPATH, ".//img[@class='xt7dq6l xl1xv1r x6ikm8r x10wlt62 xh8yej3']")
 
