@@ -105,7 +105,7 @@ function Home() {
               <div className="fb-section" key={index}>
                 
                 <a href={item.link} target="_blank" rel="noopener noreferrer">
-                  <img src={item.image} alt={`Facebook Deal ${index + 1}`} />
+                  <img src={item.image} className="scraped-car-img" alt={`Facebook Deal ${index + 1}`} />
                 </a>
                 
                 <p>Price: £{item.price}</p>

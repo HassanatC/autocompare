@@ -212,32 +212,32 @@ def search_fb(data, driver):
         driver.get(correct_link)
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div.x78zum5')))
 
-        price_elements = driver.find_elements(By.XPATH, "//div[@class='x1gslohp xkh6y0r']//span[@dir='auto']")
-        model_elements = driver.find_elements(By.XPATH, '//span[@class="x1lliihq x6ikm8r x10wlt62 x1n2onr6"]')
-        mileage_elements = driver.find_elements(By.CSS_SELECTOR, "span.x1lliihq.x6ikm8r.x10wlt62.x1n2onr6.xlyipyv.xuxw1ft.x1j85h84")
-        link_elements = driver.find_elements(By.XPATH, "//div[@class='x3ct3a4']//a[contains(@class, 'x1i10hfl')]")
-        image_elements = driver.find_elements(By.CSS_SELECTOR, "img.xt7dq6l.xl1xv1r.x6ikm8r.x10wlt62.xh8yej3")
+        #seems to work to accurately scrape price. need to adjust for mileage
+        parent_elements = driver.find_elements(By.XPATH, "//div[@class='x9f619 x78zum5 x1r8uery xdt5ytf x1iyjqo2 xs83m0k x1e558r4 x150jy0e x1iorvi4 xjkvuk6 xnpuxes x291uyu x1uepa24']")
 
-        if price_elements and model_elements and mileage_elements and link_elements and image_elements:
-            #goes through elements and returns the data
-            for price, model, mileage, link, image in zip(price_elements, model_elements, mileage_elements, link_elements, image_elements):
+        for parent in parent_elements:
+            try:
+                price_element = parent.find_element(By.XPATH, ".//span[@dir='auto' and contains(@class, 'x193iq5w')]")
+                model_element = parent.find_element(By.XPATH, ".//span[@class='x1lliihq x6ikm8r x10wlt62 x1n2onr6']")
+                mileage_element = parent.find_element(By.XPATH, ".//span[@class='x1lliihq x6ikm8r x10wlt62 x1n2onr6 xlyipyv xuxw1ft x1j85h84']")
+                link_element = parent.find_element(By.XPATH, ".//a[contains(@class, 'x1i10hfl')]")
+                image_element = parent.find_element(By.XPATH, ".//img[@class='xt7dq6l xl1xv1r x6ikm8r x10wlt62 xh8yej3']")
 
-                relative_link = link.get_attribute("href")
+                relative_link = link_element.get_attribute("href")
                 absolute_link = urljoin("https://www.facebook.com", relative_link)
-                mileage_text = mileage.text if 'km' in mileage.text else 'N/A'
-                image_url = image.get_attribute('src')
+                mileage_text = mileage_element.text if 'km' in mileage_element.text else 'N/A'
+                image_url = image_element.get_attribute('src')
 
                 scraped_data_list.append({
-                    "price": price.text,
-                    "model": model.text,
-                    "mileage": mileage_text,
-                    "link": absolute_link,
-                    "image": image_url
-                })
-
-        else:
-            print("Elements not found")
-        
+                "price": price_element.text,
+                "model": model_element.text,
+                "mileage": mileage_text,
+                "link": absolute_link,
+                "image": image_url
+            })
+            except NoSuchElementException:
+                print("Some elements not found for a parent div")
+                continue
         return scraped_data_list
 
 def merge_data_lists(existing_data_list, scraped_data_list):
@@ -270,4 +270,3 @@ def handle_cookie_popup(driver):
         accept_button.click()
     except Exception as e:
         print(f"Error handling cookie popup: {e}")
-
