@@ -179,6 +179,7 @@ def search_motors_similar(data, driver):
 def search_fb(data, driver):
     trusted_domain = "facebook.com/marketplace"
     query = f"facebook marketplace london used {data['brand']} {data['registration']} {data['mileage']} for sale"
+    fallback_text = "for sale in"
 
     driver.get("https://www.google.com")
 
@@ -196,6 +197,7 @@ def search_fb(data, driver):
     #search for relevant link, use xpath and query to find and crawl
     search_results = driver.find_elements(By.XPATH, "//h3/ancestor::a")
     correct_link = None
+    fallback_link = None
 
     first_brand_keyword = data['brand'].split()[0]
     
@@ -207,15 +209,19 @@ def search_fb(data, driver):
         except NoSuchElementException:
             print(f"No h3 element found for {link_url}")
             continue
-    
-        link_text_keywords = set(link_text.split())
 
-        if trusted_domain in link_url and first_brand_keyword in link_text_keywords:
-            correct_link = link_url
-            break
 
-    if correct_link:
-        driver.get(correct_link)
+        if trusted_domain in link_url:
+            if first_brand_keyword in link_text.split():
+                correct_link = link_url
+                break
+            elif fallback_text in link_text and fallback_link is None:
+                fallback_link = link_url
+
+    final_link = correct_link or fallback_link
+
+    if final_link:
+        driver.get(final_link)
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div.x78zum5')))
 
         # accurately scrapes price by locating parent and child elements in loop
@@ -224,6 +230,13 @@ def search_fb(data, driver):
         for parent in parent_elements:
             try:
                 price_element = parent.find_element(By.XPATH, ".//span[@dir='auto' and contains(@class, 'x193iq5w')]")
+                price_text = price_element.text.replace('£', '').replace(',', '')
+                #skip if price is non numeric i.e 'free'
+                try:
+                    float(price_text)
+                except ValueError:
+                    continue
+
                 model_element = parent.find_element(By.XPATH, ".//span[@class='x1lliihq x6ikm8r x10wlt62 x1n2onr6']")
                 mileage_element = parent.find_element(By.XPATH, ".//span[contains(@class, 'xlyipyv xuxw1ft x1j85h84') and contains(text(), 'km')]")
                 link_element = parent.find_element(By.XPATH, ".//a[contains(@class, 'x1i10hfl')]")

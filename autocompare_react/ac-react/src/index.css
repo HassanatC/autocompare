@@ -2,8 +2,8 @@
   --primary-color: #0c55a2;
   --hover-color: #2e6cb9;
   --neutral-light: #faf9f9;
-  --neutral-dark: #9c3838;
-  --border-color: #a79d9d;
+  --neutral-dark: #4a1414;
+  --border-color: #787171;
   --font-family-primary: 'Roboto', sans-serif;
   --font-family-secondary: 'Roboto', sans-serif;
 }
@@ -120,9 +120,9 @@ h2 {
 .price-badge {
   display: block;
   margin-top: 10px;
-  background-color: #535a55dd;
-  border: 2px solid #87a09e;
-  border-radius: 12px;
+  background-color: #676b77dd;
+  border: 2px solid #687775;
+  border-radius: 10px;
   padding: 5px 10px;
   width: 200px;
 }
@@ -221,7 +221,7 @@ h2 {
   border: 8px solid white;
   border-radius: 50%;
   animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: #2d1fa9e3 transparent transparent transparent;
+  border-color: #160c6fe3 transparent transparent transparent;
 }
 
 .lds-ring div:nth-child(1) {
