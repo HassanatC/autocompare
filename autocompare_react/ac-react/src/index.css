@@ -65,7 +65,8 @@ h2 {
   width: 350px;
   margin-top: 20px;
   border-radius: 8px;
-  transition: transform 0.3s ease;
+  box-shadow: 0 4px 8px rgba(73, 70, 70, 0.15);
+  transition: transform 0.2s ease;
 }
 
 .scraped-car-img:hover {
@@ -121,8 +122,8 @@ h2 {
 .price-badge {
   display: block;
   margin-top: 10px;
-  background-color: #4f525bdd;
-  border: 2px solid #687775;
+  background-color: #54596bc9;
+  border: 2px solid #adadad;
   border-radius: 10px;
   padding: 5px 10px;
   width: 200px;
@@ -131,26 +132,26 @@ h2 {
 .deal-badge {
   display: block;
   margin-top: 10px;
-  background-color: #dbdee2c2;
-  border: 2px solid #687775;
-  border-radius: 10px;
+  background-color: #dee9e4a8;
+  border: 2px solid #adadad;
+  border-radius: 7.5px;
   padding: 5px 10px;
-  width: 800px;
+  width: 810px;
 }
 
 .deal-badge a:link {
-  color: var(--primary-color); /* Color for unvisited links */
-  text-decoration: none; /* Removes underline */
+  color: var(--primary-color); 
+  text-decoration: none; 
 }
 
 .deal-badge a:visited {
-  color: #7a4b79; /* Color for visited links */
+  color: #39494b;
 }
 
 .deal-badge a:hover {
-  color: #364547; /* Color when hovered */
+  color: #11724d;
   transition: all 0.1s ease;
-  text-decoration: underline; /* Adds underline on hover */
+  text-decoration: underline;
 }
 
 .price-text {
@@ -173,7 +174,7 @@ h2 {
 }
 
 .data-section {
-  background-color: var(--neutral-light);
+  background-color: #f0e5f240;
   border: 1px solid var(--border-color); 
 }
 
@@ -253,7 +254,7 @@ h2 {
   border: 8px solid white;
   border-radius: 50%;
   animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: #160c6fe3 transparent transparent transparent;
+  border-color: #1a125fe3 transparent transparent transparent;
 }
 
 .lds-ring div:nth-child(1) {

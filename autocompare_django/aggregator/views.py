@@ -26,10 +26,11 @@ def main_view(request):
         form = CarURLForm(request.data)
         if form.is_valid():
             url = form.cleaned_data['url']
+            location = form.cleaned_data['location']
             driver = Chrome()
 
             data = scrape_car_data(url, driver)
-            fb_data = search_fb(data, driver)
+            fb_data = search_fb(data, driver, location)
             driver.quit()
 
             if not fb_data:
@@ -176,9 +177,9 @@ def search_motors_similar(data, driver):
     return scraped_data_list
 """
 
-def search_fb(data, driver):
+def search_fb(data, driver, location):
     trusted_domain = "facebook.com/marketplace"
-    query = f"facebook marketplace london used {data['brand']} {data['registration']} {data['mileage']} for sale"
+    query = f"facebook marketplace {location} used {data['brand']} {data['registration']} {data['mileage']} for sale"
     fallback_text = "for sale in"
 
     driver.get("https://www.google.com")
@@ -194,7 +195,7 @@ def search_fb(data, driver):
 
     scraped_data_list = []
 
-    #search for relevant link, use xpath and query to find and crawl
+    #search for relevant link, use xpath and query to find and crawl. loop and conditions to find a link that isn't login blocked
     search_results = driver.find_elements(By.XPATH, "//h3/ancestor::a")
     correct_link = None
     fallback_link = None
@@ -210,8 +211,9 @@ def search_fb(data, driver):
             print(f"No h3 element found for {link_url}")
             continue
 
-
         if trusted_domain in link_url:
+            if "New and used" in link_text:
+                continue
             if first_brand_keyword in link_text.split():
                 correct_link = link_url
                 break

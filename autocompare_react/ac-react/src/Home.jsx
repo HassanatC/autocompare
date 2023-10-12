@@ -54,6 +54,13 @@ function Home() {
           onChange={handleChange}
           placeholder="Enter the car URL.."
         />
+        <input
+          type="text"
+          name="location"
+          value={formData.location}
+          onChange={handleChange}
+          placeholder="Enter your location (city)..."
+          />
         <button type="submit" disabled={isLoading}>Submit</button>
       </form>
 
@@ -65,7 +72,8 @@ function Home() {
                     <div></div>
                     <div></div>
             </div>
-          <p>Please wait while we fetch relevant deals!</p>
+
+            <p>Please wait while we fetch relevant deals!</p>
         </div>
       )}
 
