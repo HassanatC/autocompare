@@ -87,7 +87,7 @@ function Home() {
 
         {isScrapeDone && (fbData && fbData.length > 0 ? (
           <div>
-            <h2>Facebook Marketplace Deals:</h2>
+            <h2 className="header">Facebook Marketplace Deals:</h2>
             {fbData.map((item, index) => (
               <div className="fb-section" key={index}>
                 
@@ -100,7 +100,9 @@ function Home() {
                 </div>
                 <p>Mileage: {item.mileage} mileage</p>
                 <p>Model: {item.model}</p>
-                <p>Deal: <a href={item.link} target="_blank" rel="noopener noreferrer">{item.link}</a></p>
+                <div className="deal-badge">
+                  <p className='deal-text'>Deal: <a href={item.link} target="_blank" rel="noopener noreferrer">{item.link}</a></p>
+                </div>
             </div>
           ))}
         </div>
