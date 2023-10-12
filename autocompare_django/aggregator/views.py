@@ -66,6 +66,12 @@ def scrape_car_data(url, driver):
         data["brand"] = f"Error: {e}"
 
     try:
+        model_type_element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'span[data-testid="advert-subtitle"]')))
+        data["model_type"] = model_type_element.text
+    except Exception as e:
+        data["model_type"] = f"Error: {e}"
+
+    try:
         mileage_element = wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(text(), 'Mileage')]/following-sibling::p")))
         data["mileage"] = mileage_element.text
     except Exception as e:
@@ -212,7 +218,7 @@ def search_fb(data, driver):
         driver.get(correct_link)
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div.x78zum5')))
 
-        #seems to work to accurately scrape price. need to adjust for mileage
+        # accurately scrapes price by locating parent and child elements in loop
         parent_elements = driver.find_elements(By.XPATH, "//div[@class='x9f619 x78zum5 x1r8uery xdt5ytf x1iyjqo2 xs83m0k x1e558r4 x150jy0e x1iorvi4 xjkvuk6 xnpuxes x291uyu x1uepa24']")
 
         for parent in parent_elements:
@@ -230,7 +236,7 @@ def search_fb(data, driver):
 
                 scraped_data_list.append({
                 "price": price_element.text,
-                "model": model_element.text,
+                "model": model_element.text.title(),
                 "mileage": mileage_text,
                 "link": absolute_link,
                 "image": image_url
@@ -249,10 +255,10 @@ def sort_scraped_data_by_price(fb_data):
             try:
                 item['price'] = float(item['price'].replace('£', '').replace(',', ''))
             except ValueError:
-                item['price'] = "N/A"
+                item['price'] = float('inf')
     
-    sorted_fb_data = sorted(fb_data, key=lambda x: float(x.get('price', float('inf'))) if isinstance(x.get('price'), float) else float('inf'))[:10]
-    return sorted_fb_data
+    sorted_fb_data = sorted(fb_data, key=lambda x: x.get('price', float('inf')))
+    return sorted_fb_data[:12]
 
 def handle_cookie_popup(driver):
     try:

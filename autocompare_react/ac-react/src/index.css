@@ -8,6 +8,10 @@
   --font-family-secondary: 'Roboto', sans-serif;
 }
 
+body, h2, p {
+  font-weight: normal;
+}
+
 body {
   font-family: var(--font-family-primary);
   background-color: #e6e9ed;
@@ -26,48 +30,20 @@ h2 {
   font-size: 32px;
 }
 
-.lds-ring {
-  display: inline-block;
-  position: relative;
-  width: 80px;
-  height: 80px;
-}
-
-.lds-ring div {
-  box-sizing: border-box;
-  display: block;
-  position: absolute;
-  width: 64px;
-  height: 64px;
-  margin: 8px;
-  border: 8px solid white;
-  border-radius: 50%;
-  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: #2d1fa9e3 transparent transparent transparent;
-}
-
-.lds-ring div:nth-child(1) {
-  animation-delay: -0.45s;
-}
-
-.lds-ring div:nth-child(2) {
-  animation-delay: -0.3s;
-}
-
-.lds-ring div:nth-child(3) {
-  animation-delay: -0.15s;
-}
-
 .form-container {
   margin: 40px auto;
-  padding: 20px;
+  padding: 35px;
   margin-top: 100px;
   border: 2px solid var(--border-color);
-  max-width: 850px;
+  max-width: 900px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(104, 101, 101, 0.15);
   background-color: var(--neutral-light);
   background: linear-gradient(#faf9f9, #d7d8ed51);
+}
+
+.price-text {
+  font-size: 24px;
 }
 
 .header {
@@ -93,6 +69,11 @@ h2 {
   margin-top: 20px;
   border-radius: 8px;
   transition: transform 0.3s ease;
+}
+
+.scraped-car-img:hover {
+  transition: all 0.2s ease;
+  transform: scale(1.025);
 }
 
 .url-form input {
@@ -141,7 +122,7 @@ h2 {
 }
 
 .data-section, .motors-section, .fb-section {
-  padding: 20px;
+  padding: 25px;
   border-radius: 8px;
   margin-top: 20px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -158,8 +139,8 @@ h2 {
 }
 
 .fb-section {
-  background-color: #d7d8ed51;
-  border: 1.5px solid var(--border-color) 
+  background-color: #e5e6f240;
+  border: 2px solid var(--border-color) 
 }
 
 .motors-section img {
@@ -209,6 +190,38 @@ h2 {
 .navbar ul li a.active {
   background-color: #4CAF50;
   color: white;
+}
+
+.lds-ring {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.lds-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border: 8px solid white;
+  border-radius: 50%;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #2d1fa9e3 transparent transparent transparent;
+}
+
+.lds-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+
+.lds-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+
+.lds-ring div:nth-child(3) {
+  animation-delay: -0.15s;
 }
 
 @keyframes lds-ring {

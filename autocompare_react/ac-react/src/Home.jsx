@@ -45,7 +45,7 @@ function Home() {
     <div className="form-container">
 
       <header className="header">AutoCompare</header>
-      <p className="top-info">Simply enter the URL of an AutoTrader car that you like, and we will find you better deals. For completely free.</p>
+      <p className="top-info">Simply enter the URL of an AutoTrader car that you like, and we will find you better deals. For free.</p>
       <form className="url-form" onSubmit={handleSubmit}>
         <input
           type="text"
@@ -73,8 +73,9 @@ function Home() {
         <div className="data-section">
           <h2>Your Chosen Car:</h2>
           <img src={data.image_url} className="scraped-car-img" alt="Car" />
-          <p>Car Price: {data.price}</p>
+          <p className="price-text">Car Price: {data.price}</p>
           <p>Car Brand: {data.brand}</p>
+          <p>Car Model Type: {data.model_type}</p>
           <p>Car Registration: {data.registration}</p>
           <p>Car Mileage: {data.mileage} </p>
           <p>Previous Owners: {data.previous_owners}</p>
@@ -92,7 +93,7 @@ function Home() {
                   <img src={item.image} className="scraped-car-img" alt={`Facebook Deal ${index + 1}`} />
                 </a>
                 
-                <p>Price: {item.price}</p>
+                <p className="price-text">Price: {item.price}</p>
                 <p>Mileage: {item.mileage} mileage</p>
                 <p>Model: {item.model}</p>
                 <p>Deal: <a href={item.link} target="_blank" rel="noopener noreferrer">{item.link}</a></p>
