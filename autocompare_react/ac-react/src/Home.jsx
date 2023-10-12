@@ -73,7 +73,9 @@ function Home() {
         <div className="data-section">
           <h2>Your Chosen Car:</h2>
           <img src={data.image_url} className="scraped-car-img" alt="Car" />
-          <p className="price-text">Car Price: {data.price}</p>
+          <div className="price-badge">
+            <p className="price-text">Car Price: {data.price}</p>
+          </div>
           <p>Car Brand: {data.brand}</p>
           <p>Car Model Type: {data.model_type}</p>
           <p>Car Registration: {data.registration}</p>
@@ -93,7 +95,9 @@ function Home() {
                   <img src={item.image} className="scraped-car-img" alt={`Facebook Deal ${index + 1}`} />
                 </a>
                 
-                <p className="price-text">Price: {item.price}</p>
+                <div className="price-badge">
+                  <p className="price-text">Price: {item.price}</p>
+                </div>
                 <p>Mileage: {item.mileage} mileage</p>
                 <p>Model: {item.model}</p>
                 <p>Deal: <a href={item.link} target="_blank" rel="noopener noreferrer">{item.link}</a></p>

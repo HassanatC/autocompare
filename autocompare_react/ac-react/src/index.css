@@ -39,11 +39,7 @@ h2 {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(104, 101, 101, 0.15);
   background-color: var(--neutral-light);
-  background: linear-gradient(#faf9f9, #d7d8ed51);
-}
-
-.price-text {
-  font-size: 24px;
+  background: linear-gradient(#faf9f9, #ddddea51);
 }
 
 .header {
@@ -119,6 +115,22 @@ h2 {
 
 .reg-text {
   margin-top: 5px;
+}
+
+.price-badge {
+  display: block;
+  margin-top: 10px;
+  background-color: #535a55dd;
+  border: 2px solid #87a09e;
+  border-radius: 12px;
+  padding: 5px 10px;
+  width: 200px;
+}
+
+.price-text {
+  font-size: 26px;
+  color: rgb(238, 238, 238);
+  margin: 0; /* Remove default margin */
 }
 
 .data-section, .motors-section, .fb-section {
